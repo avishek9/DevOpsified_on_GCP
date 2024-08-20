@@ -18,7 +18,7 @@ resource "google_compute_instance" "tool-server" {
     }
   }
 
-  metadata_startup_script = file("./tools-install.sh")
+  metadata_startup_script = file("tools-install.sh")
 
   service_account {
     email  = google_service_account.tool-machine-sa.email
