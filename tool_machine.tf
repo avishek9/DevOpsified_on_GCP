@@ -5,7 +5,7 @@ resource "google_compute_instance" "tool-server" {
 
   boot_disk {
     initialize_params {
-      image = "projects/debian-cloud/global/images/debian-12-bookworm-v20240815"
+      image = "projects/debian-cloud/global/images/debian-11-bullseye-v20240815"
       size  = 30
     }
   }
