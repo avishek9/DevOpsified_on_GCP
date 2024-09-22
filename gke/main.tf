@@ -18,7 +18,6 @@ module "gke" {
   cluster-name               = "${local.env}-${local.org}-${var.cluster-name}"
   cidr-block                 = var.vpc-cidr-block
   vpc-name                   = "${local.env}-${local.org}-${var.vpc-name}"
-  igw-name                   = "${local.env}-${local.org}-${var.igw-name}"
   pub-cidr-block             = var.pub-cidr-block
   pub-sub-name               = "${local.env}-${local.org}-${var.pub-sub-name}"
   pri-cidr-block             = var.pri-cidr-block
