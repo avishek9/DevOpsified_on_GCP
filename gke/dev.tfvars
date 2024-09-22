@@ -1,6 +1,7 @@
 env                        = "dev"
 project                    = "dummyproject-429106"
 region                     = "us-central1"
+jump-zone                  = "us-central1-c"
 vpc-cidr-block             = "10.16.0.0/16"
 vpc-name                   = "devopsified-gke-vpc"
 pub-cidr-block             = "10.16.0.0/18"
