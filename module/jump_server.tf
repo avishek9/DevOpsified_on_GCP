@@ -11,7 +11,7 @@ resource "google_compute_instance" "jump-server" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.public-subnet.name
+    subnetwork = google_compute_subnetwork.public_subnet.name
 
     access_config {
       # Ephemeral public IP

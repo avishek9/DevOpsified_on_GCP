@@ -7,7 +7,6 @@ pub-subnet-count      = 3
 pub-cidr-block        = "10.16.0.0/18"
 pub-availability-zone = ["us-central1-a", "us-central1-b", "us-central1-c"]
 pub-sub-name          = "subnet-public"
-pri-subnet-count      = 3
 pri-cidr-block        = "10.0.0.0/16"
 sec-pod-cidr-block    = "10.1.0.0/16"
 sec-service-cidr-block= "10.2.0.0/20"
