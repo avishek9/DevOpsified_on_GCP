@@ -18,11 +18,7 @@ variable "pri-sub-name" {}
 variable "public-rt-name" {}
 variable "private-rt-name" {}
 variable "gke-ingress-fw-rule" {}
-variable "gke-egress-fw-rule" {
-
-}
-
-variable "cluster-version" {}
+variable "gke-egress-fw-rule" {}
 variable "endpoint-private-access" {}
 variable "endpoint-public-access" {}
 variable "ondemand_instance_types" {}

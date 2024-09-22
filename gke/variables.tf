@@ -8,16 +8,11 @@ variable "cluster-name" {}
 variable "vpc-cidr-block" {}
 variable "vpc-name" {}
 variable "igw-name" {}
-variable "pub-subnet-count" {}
 variable "pub-cidr-block" {}
 variable "static-ip-name" {}
 variable "router-name" {}
 variable "cloud-nat-name" {}
-variable "pub-availability-zone" {
-  type = list(string)
-}
 variable "pub-sub-name" {}
-variable "pri-subnet-count" {}
 variable "pri-cidr-block" {}
 variable "sec-pod-cidr-block" {}
 variable "sec-service-cidr-block" {}
@@ -31,11 +26,6 @@ variable "ngw-name" {}
 variable "eks-sg" {}
 variable "gke-egress-fw-rule" {}
 variable "gke-ingress-fw-rule" {}
-
-
-# EKS
-variable "is-eks-cluster-enabled" {}
-variable "cluster-version" {}
 variable "endpoint-private-access" {}
 variable "endpoint-public-access" {}
 variable "ondemand_instance_types" {}

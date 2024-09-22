@@ -35,7 +35,6 @@ module "gke" {
   desired_capacity_spot      = var.desired_capacity_spot
   min_capacity_spot          = var.min_capacity_spot
   max_capacity_spot          = var.max_capacity_spot
-  cluster-version            = var.cluster-version
   endpoint-private-access    = var.endpoint-private-access
   endpoint-public-access     = var.endpoint-public-access
 }
