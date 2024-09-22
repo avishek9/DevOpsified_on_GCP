@@ -21,9 +21,6 @@ variable "sec-service-cidr-block" {}
 variable "pri-sub-name" {}
 variable "public-rt-name" {}
 variable "private-rt-name" {}
-variable "eip-name" {}
-variable "ngw-name" {}
-variable "eks-sg" {}
 variable "gke-egress-fw-rule" {}
 variable "gke-ingress-fw-rule" {}
 variable "endpoint-private-access" {}
