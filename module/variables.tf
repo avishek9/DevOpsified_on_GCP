@@ -6,9 +6,9 @@ variable "jump-zone" {}
 variable "vpc-name" {}
 variable "env" {}
 variable "igw-name" {}
-variable "static-ip-name"{}
-variable "router-name"{}
-variable "cloud-nat-name"{}
+variable "static-ip-name" {}
+variable "router-name" {}
+variable "cloud-nat-name" {}
 variable "pub-cidr-block" {}
 variable "pub-sub-name" {}
 variable "pri-cidr-block" {}
@@ -19,7 +19,7 @@ variable "public-rt-name" {}
 variable "private-rt-name" {}
 variable "gke-ingress-fw-rule" {}
 variable "gke-egress-fw-rule" {
-  
+
 }
 
 variable "cluster-version" {}

@@ -1,12 +1,15 @@
 resource "google_container_cluster" "gke_cluster" {
-  name     = var.cluster-name
-  location = var.region
-  initial_node_count = 1
-  min_master_version = var.cluster-version
+  name                     = var.cluster-name
+  location                 = var.region
+  initial_node_count       = 1
   remove_default_node_pool = true
 
   network    = google_compute_network.devopsified-gke-vpc.id
   subnetwork = google_compute_subnetwork.private_subnet.id
+
+  release_channel {
+    channel = "STABLE"
+  }
 
   private_cluster_config {
     enable_private_endpoint = var.endpoint-private-access
@@ -24,15 +27,15 @@ resource "google_container_cluster" "gke_cluster" {
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
     tags         = ["gke-cluster"]
     labels = {
-    env  = var.env
-    name = var.cluster-name
+      env  = var.env
+      name = var.cluster-name
     }
   }
 
   master_auth {
-  client_certificate_config {
-    issue_client_certificate = false
-  }
+    client_certificate_config {
+      issue_client_certificate = false
+    }
   }
 
   master_authorized_networks_config {
@@ -44,9 +47,9 @@ resource "google_container_cluster" "gke_cluster" {
 }
 
 resource "google_container_node_pool" "gke_node_pool" {
-  name       = "${var.cluster-name}-on-demand-nodes"
-  cluster    = google_container_cluster.gke_cluster.name
-  location   = google_container_cluster.gke_cluster.location
+  name     = "${var.cluster-name}-on-demand-nodes"
+  cluster  = google_container_cluster.gke_cluster.name
+  location = google_container_cluster.gke_cluster.location
 
   node_count = var.desired_capacity_on_demand
 
@@ -78,9 +81,9 @@ resource "google_container_node_pool" "gke_node_pool" {
 }
 
 resource "google_container_node_pool" "spot_node_pool" {
-  name       = "${var.cluster-name}-spot-nodes"
-  cluster    = google_container_cluster.gke_cluster.name
-  location   = google_container_cluster.gke_cluster.location
+  name     = "${var.cluster-name}-spot-nodes"
+  cluster  = google_container_cluster.gke_cluster.name
+  location = google_container_cluster.gke_cluster.location
 
   node_count = var.desired_capacity_spot
 
@@ -100,7 +103,7 @@ resource "google_container_node_pool" "spot_node_pool" {
     ]
 
     labels = {
-      type = "spot"
+      type      = "spot"
       lifecycle = "spot"
     }
   }

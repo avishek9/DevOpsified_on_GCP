@@ -1,5 +1,5 @@
 resource "google_compute_network" "devopsified-vpc" {
-  name = "devopsified-vpc"
+  name    = "devopsified-vpc"
   project = var.project
 }
 
@@ -11,8 +11,8 @@ resource "google_compute_subnetwork" "devopsified-public-subnet" {
 }
 
 resource "google_compute_firewall" "ingress-tool-server" {
-  name    = "ingress-tool-server"
-  network = google_compute_network.devopsified-vpc.name
+  name        = "ingress-tool-server"
+  network     = google_compute_network.devopsified-vpc.name
   description = "Allowing Jenkins, Sonarqube, SSH Access"
 
   allow {
