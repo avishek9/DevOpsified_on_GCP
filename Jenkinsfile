@@ -23,9 +23,7 @@ pipeline {
         }
         stage('Init') {
             steps {
-                withGCP('gcp_auth') {
                 sh 'terraform -chdir=gke/ init'
-                }
             }
         }
         stage('Validate') {
