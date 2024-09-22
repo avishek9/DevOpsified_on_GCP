@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Git Pulling') {
             steps {
-                git branch: 'master', url: 'https://github.com/avishek9/DevOpsified_on_GCP.git'
+                git credentialsId: 'githubCred' branch: 'master', url: 'https://github.com/avishek9/DevOpsified_on_GCP.git'
             }
         }
         stage('Init') {
