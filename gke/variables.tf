@@ -7,7 +7,6 @@ variable "env" {}
 variable "cluster-name" {}
 variable "vpc-cidr-block" {}
 variable "vpc-name" {}
-variable "igw-name" {}
 variable "pub-cidr-block" {}
 variable "static-ip-name" {}
 variable "router-name" {}

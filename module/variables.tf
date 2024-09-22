@@ -5,7 +5,6 @@ variable "region" {}
 variable "jump-zone" {}
 variable "vpc-name" {}
 variable "env" {}
-variable "igw-name" {}
 variable "static-ip-name" {}
 variable "router-name" {}
 variable "cloud-nat-name" {}
