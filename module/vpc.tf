@@ -4,6 +4,7 @@ locals {
 
 resource "google_compute_network" "devopsified-gke-vpc" {
   name = var.vpc-name
+  project = var.project
 }
 
 resource "google_compute_subnetwork" "public_subnet" {
