@@ -2,168 +2,67 @@ locals {
   cluster-name = var.cluster-name
 }
 
-resource "aws_vpc" "vpc" {
-  cidr_block           = var.cidr-block
-  instance_tenancy     = "default"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
-  tags = {
-    Name = var.vpc-name
-    Env  = var.env
-
-  }
+resource "google_compute_network" "devopsified-gke-vpc" {
+  name = var.vpc-name
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id
-
-  tags = {
-    Name                                          = var.igw-name
-    env                                           = var.env
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
-  }
-
-  depends_on = [aws_vpc.vpc]
+resource "google_compute_subnetwork" "public_subnet" {
+  count=var.pub-subnet-count
+  name                     = "${var.pub-sub-name}-${count.index + 1}"
+  ip_cidr_range            = element(var.pub-cidr-block, count.index)
+  region                   = var.region
+  network                  = google_compute_network.devopsified-gke-vpc.name
 }
 
-resource "aws_subnet" "public-subnet" {
-  count                   = var.pub-subnet-count
-  vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = element(var.pub-cidr-block, count.index)
-  availability_zone       = element(var.pub-availability-zone, count.index)
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name                                          = "${var.pub-sub-name}-${count.index + 1}"
-    Env                                           = var.env
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
-    "kubernetes.io/role/elb"                      = "1"
-  }
-
-  depends_on = [aws_vpc.vpc,
-  ]
-}
-
-resource "aws_subnet" "private-subnet" {
+resource "google_compute_subnetwork" "private_subnet" {
   count                   = var.pri-subnet-count
-  vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = element(var.pri-cidr-block, count.index)
-  availability_zone       = element(var.pri-availability-zone, count.index)
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name                                          = "${var.pri-sub-name}-${count.index + 1}"
-    Env                                           = var.env
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
-    "kubernetes.io/role/internal-elb"             = "1"
-  }
-
-  depends_on = [aws_vpc.vpc,
-  ]
+  name                     = "${var.pri-sub-name}-${count.index + 1}"
+  ip_cidr_range            = element(var.pri-cidr-block, count.index)
+  region                   = var.region
+  network                  = google_compute_network.devopsified-gke-vpc.name
+  private_ip_google_access = true # Enable Private Google Access
 }
 
-
-resource "aws_route_table" "public-rt" {
-  vpc_id = aws_vpc.vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
-  tags = {
-    Name = var.public-rt-name
-    env  = var.env
-  }
-
-  depends_on = [aws_vpc.vpc
-  ]
+resource "google_compute_address" "static_ip" {
+  name = var.static-ip-name
+  region = var.region
 }
 
-resource "aws_route_table_association" "name" {
-  count          = 3
-  route_table_id = aws_route_table.public-rt.id
-  subnet_id      = aws_subnet.public-subnet[count.index].id
-
-  depends_on = [aws_vpc.vpc,
-    aws_subnet.public-subnet
-  ]
+resource "google_compute_router" "devopsified_cloud_router" {
+  name    = var.router-name
+  region  = var.region
+  network = google_compute_network.devopsified-gke-vpc.name
 }
 
-resource "aws_eip" "ngw-eip" {
-  domain = "vpc"
+# Create a Cloud NAT for outbound internet access
+resource "google_compute_router_nat" "devopsified_cloud_nat" {
+  name   = var.cloud-nat-name
+  region = var.region
+  router = google_compute_router.devopsified_cloud_router.name
 
-  tags = {
-    Name = var.eip-name
-  }
+  nat_ips                = [google_compute_address.static_ip.name]  # Optional: assign a static IP
 
-  depends_on = [aws_vpc.vpc
-  ]
-
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-resource "aws_nat_gateway" "ngw" {
-  allocation_id = aws_eip.ngw-eip.id
-  subnet_id     = aws_subnet.public-subnet[0].id
+resource "google_compute_firewall" "gke-cluster-ingress-fw-rule" {
+  name    = var.gke-ingress-fw-rule
+  network = google_compute_network.devopsified-gke-vpc.name
+  description = "Allowing 443 from jump server only"
 
-  tags = {
-    Name = var.ngw-name
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
   }
 
-  depends_on = [aws_vpc.vpc,
-    aws_eip.ngw-eip
-  ]
+  source_ranges = ["0.0.0.0/0"]
 }
-
-resource "aws_route_table" "private-rt" {
-  vpc_id = aws_vpc.vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.ngw.id
+resource "google_compute_firewall" "gke-cluster-egress-fw-rule" {
+  name    = var.gke-egress-fw-rule
+  network = google_compute_network.devopsified-gke-vpc.name
+  direction = "EGRESS"
+  allow{
+    protocol           = "all"
   }
-
-  tags = {
-    Name = var.private-rt-name
-    env  = var.env
-  }
-
-  depends_on = [aws_vpc.vpc,
-  ]
-}
-
-resource "aws_route_table_association" "private-rt-association" {
-  count          = 3
-  route_table_id = aws_route_table.private-rt.id
-  subnet_id      = aws_subnet.private-subnet[count.index].id
-
-  depends_on = [aws_vpc.vpc,
-    aws_subnet.private-subnet
-  ]
-}
-
-resource "aws_security_group" "eks-cluster-sg" {
-  name        = var.eks-sg
-  description = "Allow 443 from Jump Server only"
-
-  vpc_id = aws_vpc.vpc.id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] // It should be specific IP range
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = var.eks-sg
-  }
+  destination_ranges = ["0.0.0.0/0"]
 }

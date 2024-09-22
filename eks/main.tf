@@ -7,6 +7,10 @@ module "eks" {
   source = "../module"
 
   env                   = var.env
+  region = var.region
+  cloud-nat-name = var.cloud-nat-name
+  router-name = var.router-name
+  static-ip-name = var.static-ip-name
   cluster-name          = "${local.env}-${local.org}-${var.cluster-name}"
   cidr-block            = var.vpc-cidr-block
   vpc-name              = "${local.env}-${local.org}-${var.vpc-name}"
@@ -21,10 +25,8 @@ module "eks" {
   pri-sub-name          = "${local.env}-${local.org}-${var.pri-sub-name}"
   public-rt-name        = "${local.env}-${local.org}-${var.public-rt-name}"
   private-rt-name       = "${local.env}-${local.org}-${var.private-rt-name}"
-  eip-name              = "${local.env}-${local.org}-${var.eip-name}"
-  ngw-name              = "${local.env}-${local.org}-${var.ngw-name}"
   eks-sg                = var.eks-sg
-
+  gke-egress-fw-rule    = var.gke-egress-fw-rule
   is_eks_role_enabled           = true
   is_eks_nodegroup_role_enabled = true
   ondemand_instance_types       = var.ondemand_instance_types

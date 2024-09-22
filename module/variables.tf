@@ -1,8 +1,12 @@
 variable "cluster-name" {}
 variable "cidr-block" {}
+variable "region" {}
 variable "vpc-name" {}
 variable "env" {}
 variable "igw-name" {}
+variable "static-ip-name"{}
+variable "router-name"{}
+variable "cloud-nat-name"{}
 variable "pub-subnet-count" {}
 variable "pub-cidr-block" {
   type = list(string)
@@ -21,9 +25,10 @@ variable "pri-availability-zone" {
 variable "pri-sub-name" {}
 variable "public-rt-name" {}
 variable "private-rt-name" {}
-variable "eip-name" {}
-variable "ngw-name" {}
-variable "eks-sg" {}
+variable "gke-ingress-fw-rule" {}
+variable "gke-egress-fw-rule" {
+  
+}
 
 #IAM
 variable "is_eks_role_enabled" {

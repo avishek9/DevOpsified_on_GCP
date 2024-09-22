@@ -1,4 +1,4 @@
-variable "aws-region" {}
+variable "region" {}
 variable "env" {}
 variable "cluster-name" {}
 variable "vpc-cidr-block" {}
@@ -8,6 +8,9 @@ variable "pub-subnet-count" {}
 variable "pub-cidr-block" {
   type = list(string)
 }
+variable "static-ip-name"{}
+variable "router-name"{}
+variable "cloud-nat-name"{}
 variable "pub-availability-zone" {
   type = list(string)
 }
@@ -25,6 +28,7 @@ variable "private-rt-name" {}
 variable "eip-name" {}
 variable "ngw-name" {}
 variable "eks-sg" {}
+variable gke-egressf-fw-rule
 
 
 # EKS
