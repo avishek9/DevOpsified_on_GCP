@@ -1,7 +1,7 @@
 resource "google_compute_instance" "tool-server" {
   name         = "tool-server"
   machine_type = "n2-standard-8"
-  zone         = var.zone
+  zone         =  var.zone
 
   boot_disk {
     initialize_params {

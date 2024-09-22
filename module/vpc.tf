@@ -7,20 +7,29 @@ resource "google_compute_network" "devopsified-gke-vpc" {
 }
 
 resource "google_compute_subnetwork" "public_subnet" {
-  count=var.pub-subnet-count
-  name                     = "${var.pub-sub-name}-${count.index + 1}"
-  ip_cidr_range            = element(var.pub-cidr-block, count.index)
+  name                     = var.pub-sub-name
+  ip_cidr_range            = var.pub-cidr-block
   region                   = var.region
   network                  = google_compute_network.devopsified-gke-vpc.name
 }
 
 resource "google_compute_subnetwork" "private_subnet" {
-  count                   = var.pri-subnet-count
-  name                     = "${var.pri-sub-name}-${count.index + 1}"
-  ip_cidr_range            = element(var.pri-cidr-block, count.index)
+  name                     = var.pri-sub-name
+  ip_cidr_range            = var.pri-cidr-block
   region                   = var.region
   network                  = google_compute_network.devopsified-gke-vpc.name
   private_ip_google_access = true # Enable Private Google Access
+
+    # Secondary ranges for pods and services (required)
+  secondary_ip_range {
+    range_name    = "pods-range"
+    ip_cidr_range = var.sec-pod-cidr-block
+  }
+
+  secondary_ip_range {
+    range_name    = "services-range"
+    ip_cidr_range = var.sec-service-cidr-block
+  }
 }
 
 resource "google_compute_address" "static_ip" {

@@ -1,111 +1,114 @@
-resource "aws_eks_cluster" "eks" {
-
-  count    = var.is-eks-cluster-enabled == true ? 1 : 0
+resource "google_container_cluster" "gke_cluster" {
   name     = var.cluster-name
-  role_arn = aws_iam_role.eks-cluster-role[count.index].arn
-  version  = var.cluster-version
+  location = var.region
+  initial_node_count = 1
+  min_master_version = var.cluster-version
+  remove_default_node_pool = true
 
-  vpc_config {
-    subnet_ids              = [aws_subnet.private-subnet[0].id, aws_subnet.private-subnet[1].id, aws_subnet.private-subnet[2].id]
-    endpoint_private_access = var.endpoint-private-access
-    endpoint_public_access  = var.endpoint-public-access
-    security_group_ids      = [aws_security_group.eks-cluster-sg.id]
+  network    = google_compute_network.devopsified-gke-vpc.id
+  subnetwork = google_compute_subnetwork.private_subnet.id
+
+  private_cluster_config {
+    enable_private_endpoint = var.endpoint-private-access
+    enable_private_nodes    = true
+    master_ipv4_cidr_block  = "172.16.0.0/28"
   }
 
-
-  access_config {
-    authentication_mode                         = "CONFIG_MAP"
-    bootstrap_cluster_creator_admin_permissions = true
+  ip_allocation_policy {
+    cluster_secondary_range_name  = "pods-range"
+    services_secondary_range_name = "services-range"
   }
 
-  tags = {
-    Name = var.cluster-name
-    Env  = var.env
+  node_config {
+    machine_type = "e2-medium"
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    tags         = ["gke-cluster"]
+    labels = {
+    env  = var.env
+    name = var.cluster-name
+    }
+  }
+
+  master_auth {
+  client_certificate_config {
+    issue_client_certificate = false
+  }
+  }
+
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = google_compute_instance.jump-server.network_interface[0].network_ip
+      display_name = "Jump Server"
+    }
   }
 }
 
-# OIDC Provider
-resource "aws_iam_openid_connect_provider" "eks-oidc" {
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.eks-certificate.certificates[0].sha1_fingerprint]
-  url             = data.tls_certificate.eks-certificate.url
+resource "google_container_node_pool" "gke_node_pool" {
+  name       = "${var.cluster-name}-on-demand-nodes"
+  cluster    = google_container_cluster.gke_cluster.name
+  location   = google_container_cluster.gke_cluster.location
+
+  node_count = var.desired_capacity_on_demand
+
+  autoscaling {
+    min_node_count = var.min_capacity_on_demand
+    max_node_count = var.max_capacity_on_demand
+  }
+
+  node_config {
+    machine_type = var.ondemand_instance_types
+    disk_size_gb = 100
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring"
+    ]
+
+    labels = {
+      type = "ondemand"
+    }
+  }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
+  initial_node_count = 1
 }
 
+resource "google_container_node_pool" "spot_node_pool" {
+  name       = "${var.cluster-name}-spot-nodes"
+  cluster    = google_container_cluster.gke_cluster.name
+  location   = google_container_cluster.gke_cluster.location
 
-# AddOns for EKS Cluster
-resource "aws_eks_addon" "eks-addons" {
-  for_each      = { for idx, addon in var.addons : idx => addon }
-  cluster_name  = aws_eks_cluster.eks[0].name
-  addon_name    = each.value.name
-  addon_version = each.value.version
+  node_count = var.desired_capacity_spot
 
-  depends_on = [
-    aws_eks_node_group.ondemand-node,
-    aws_eks_node_group.spot-node
-  ]
-}
-
-# NodeGroups
-resource "aws_eks_node_group" "ondemand-node" {
-  cluster_name    = aws_eks_cluster.eks[0].name
-  node_group_name = "${var.cluster-name}-on-demand-nodes"
-
-  node_role_arn = aws_iam_role.eks-nodegroup-role[0].arn
-
-  scaling_config {
-    desired_size = var.desired_capacity_on_demand
-    min_size     = var.min_capacity_on_demand
-    max_size     = var.max_capacity_on_demand
+  autoscaling {
+    min_node_count = var.min_capacity_spot
+    max_node_count = var.max_capacity_spot
   }
 
+  node_config {
+    preemptible  = true
+    machine_type = var.spot_instance_types
+    disk_size_gb = 100
 
-  subnet_ids = [aws_subnet.private-subnet[0].id, aws_subnet.private-subnet[1].id, aws_subnet.private-subnet[2].id]
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring"
+    ]
 
-  instance_types = var.ondemand_instance_types
-  capacity_type  = "ON_DEMAND"
-  labels = {
-    type = "ondemand"
+    labels = {
+      type = "spot"
+      lifecycle = "spot"
+    }
   }
 
-  update_config {
-    max_unavailable = 1
-  }
-  tags = {
-    "Name" = "${var.cluster-name}-ondemand-nodes"
+  management {
+    auto_repair  = true
+    auto_upgrade = true
   }
 
-  depends_on = [aws_eks_cluster.eks]
-}
-
-resource "aws_eks_node_group" "spot-node" {
-  cluster_name    = aws_eks_cluster.eks[0].name
-  node_group_name = "${var.cluster-name}-spot-nodes"
-
-  node_role_arn = aws_iam_role.eks-nodegroup-role[0].arn
-
-  scaling_config {
-    desired_size = var.desired_capacity_spot
-    min_size     = var.min_capacity_spot
-    max_size     = var.max_capacity_spot
-  }
-
-
-  subnet_ids = [aws_subnet.private-subnet[0].id, aws_subnet.private-subnet[1].id, aws_subnet.private-subnet[2].id]
-
-  instance_types = var.spot_instance_types
-  capacity_type  = "SPOT"
-
-  update_config {
-    max_unavailable = 1
-  }
-  tags = {
-    "Name" = "${var.cluster-name}-spot-nodes"
-  }
-  labels = {
-    type      = "spot"
-    lifecycle = "spot"
-  }
-  disk_size = 50
-
-  depends_on = [aws_eks_cluster.eks]
+  initial_node_count = 1
 }

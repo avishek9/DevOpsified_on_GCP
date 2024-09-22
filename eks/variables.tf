@@ -1,13 +1,15 @@
 variable "region" {}
+variable "project" {}
+variable "jump-zone" {
+  
+}
 variable "env" {}
 variable "cluster-name" {}
 variable "vpc-cidr-block" {}
 variable "vpc-name" {}
 variable "igw-name" {}
 variable "pub-subnet-count" {}
-variable "pub-cidr-block" {
-  type = list(string)
-}
+variable "pub-cidr-block" {}
 variable "static-ip-name"{}
 variable "router-name"{}
 variable "cloud-nat-name"{}
@@ -16,19 +18,19 @@ variable "pub-availability-zone" {
 }
 variable "pub-sub-name" {}
 variable "pri-subnet-count" {}
-variable "pri-cidr-block" {
-  type = list(string)
-}
-variable "pri-availability-zone" {
-  type = list(string)
-}
+variable "pri-cidr-block" {}
+variable "sec-pod-cidr-block" {}
+variable "sec-service-cidr-block" {}
+
+
 variable "pri-sub-name" {}
 variable "public-rt-name" {}
 variable "private-rt-name" {}
 variable "eip-name" {}
 variable "ngw-name" {}
 variable "eks-sg" {}
-variable gke-egressf-fw-rule
+variable gke-egress-fw-rule{}
+variable gke-ingress-fw-rule{}
 
 
 # EKS
