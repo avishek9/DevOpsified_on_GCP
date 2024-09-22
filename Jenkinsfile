@@ -28,14 +28,11 @@ pipeline {
         }
         stage('Validate') {
             steps {
-                withGCP('gcp_auth') {
                 sh 'terraform -chdir=gke/ validate'
-                }
             }
         }
         stage('Action') {
             steps {
-                withGCP('gcp_auth') {
                     script {    
                         if (params.Terraform_Action == 'plan') {
                             sh "terraform -chdir=gke/ plan -var-file=${params.Environment}.tfvars"
@@ -46,7 +43,6 @@ pipeline {
                         } else {
                             error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
                         }
-                    }
                 }
             }
         }
