@@ -17,3 +17,9 @@ resource "google_project_iam_member" "compute_network_admin" {
   role    = "roles/compute.networkAdmin"
   member  = "serviceAccount:${google_service_account.tool-machine-sa.email}"
 }
+
+resource "google_project_iam_member" "sa_project_iam_admin" {
+  project = var.project
+  role    = "roles/resourcemanager.projectIamAdmin"
+  member  = "serviceAccount:${google_service_account.tool-machine-sa.email}"
+}
