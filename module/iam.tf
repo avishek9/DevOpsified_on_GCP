@@ -16,9 +16,9 @@ resource "google_project_iam_member" "jump_server_compute_instance_admin" {
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }
 
-resource "google_project_iam_member" "jump_server_network_user" {
+resource "google_project_iam_member" "jump_server_network_admin" {
   project = var.project
-  role    = "roles/compute.networkUser" # Access network resources
+  role    = "roles/compute.networkAdmin" # Access network resources
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }
 
@@ -34,16 +34,8 @@ resource "google_project_iam_member" "jump_server_monitoring_viewer" {
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }
 
-# Grant the Service Account Admin role (for iam.serviceAccounts.create)
-resource "google_project_iam_member" "service_account_admin" {
+resource "google_project_iam_member" "jump_server_instance_admin" {
   project = var.project
-  role    = "roles/iam.serviceAccountAdmin"
-  member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
-}
-
-# Grant the Compute Network Admin role (for compute.networks.create, compute.addresses.create, and compute.addresses.setLabels)
-resource "google_project_iam_member" "compute_network_admin" {
-  project = var.project
-  role    = "roles/compute.networkAdmin"
+  role    = "roles/compute.instanceAdmin"
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }

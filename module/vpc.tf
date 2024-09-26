@@ -50,6 +50,7 @@ resource "google_compute_router_nat" "devopsified_cloud_nat" {
   region = var.region
   router = google_compute_router.devopsified_cloud_router.name
   project = var.project
+  nat_ip_allocate_option = "MANUAL_ONLY"
   nat_ips = [google_compute_address.static_ip.name] # Optional: assign a static IP
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
