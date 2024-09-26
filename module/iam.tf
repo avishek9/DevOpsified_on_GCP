@@ -16,9 +16,9 @@ resource "google_project_iam_member" "jump_server_compute_instance_admin" {
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }
 
-resource "google_project_iam_member" "jump_server_network_admin" {
+resource "google_project_iam_member" "jump_server_network_user" {
   project = var.project
-  role    = "roles/compute.networkAdmin" # Access network resources
+  role    = "roles/compute.networkUser" # Access network resources
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }
 
@@ -31,11 +31,5 @@ resource "google_project_iam_member" "jump_server_logging_writer" {
 resource "google_project_iam_member" "jump_server_monitoring_viewer" {
   project = var.project
   role    = "roles/monitoring.viewer" # View monitoring data
-  member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
-}
-
-resource "google_project_iam_member" "jump_server_instance_admin" {
-  project = var.project
-  role    = "roles/compute.instanceAdmin"
   member  = "serviceAccount:${google_service_account.jump_server_sa.email}"
 }

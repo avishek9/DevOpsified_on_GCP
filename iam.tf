@@ -23,3 +23,9 @@ resource "google_project_iam_member" "sa_project_iam_admin" {
   role    = "roles/resourcemanager.projectIamAdmin"
   member  = "serviceAccount:${google_service_account.tool-machine-sa.email}"
 }
+
+resource "google_project_iam_member" "jump_server_instance_admin" {
+  project = var.project
+  role    = "roles/compute.instanceAdmin"
+  member  = "serviceAccount:${google_service_account.tool-machine-sa.email}"
+}
