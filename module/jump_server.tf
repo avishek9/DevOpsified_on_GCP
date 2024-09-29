@@ -3,6 +3,7 @@ resource "google_compute_instance" "jump-server" {
   machine_type = "n2d-standard-4"
   zone         = var.jump-zone
   project = var.project
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
