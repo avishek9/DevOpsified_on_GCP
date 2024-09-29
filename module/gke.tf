@@ -60,7 +60,7 @@ resource "google_container_node_pool" "gke_node_pool" {
 
   node_config {
     machine_type = var.ondemand_instance_types
-    disk_size_gb = 90
+    disk_size_gb = 70
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
@@ -95,7 +95,7 @@ resource "google_container_node_pool" "spot_node_pool" {
   node_config {
     preemptible  = true
     machine_type = var.spot_instance_types
-    disk_size_gb = 90
+    disk_size_gb = 70
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
