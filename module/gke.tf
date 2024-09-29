@@ -26,6 +26,7 @@ resource "google_container_cluster" "gke_cluster" {
     machine_type = "e2-medium"
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
     tags         = ["gke-cluster"]
+    disk_size_gb  = 10
     labels = {
       env  = var.env
       name = var.cluster-name
