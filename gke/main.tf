@@ -9,7 +9,7 @@ module "gke" {
   env                        = var.env
   jump-zone                  = var.jump-zone
   project                    = var.project
-  sec-pod-cidr-block         = var.sec-service-cidr-block
+  sec-pod-cidr-block         = var.sec-pod-cidr-block
   sec-service-cidr-block     = var.sec-service-cidr-block
   region                     = var.region
   cloud-nat-name             = var.cloud-nat-name
