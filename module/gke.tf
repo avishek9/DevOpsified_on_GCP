@@ -49,7 +49,7 @@ resource "google_container_cluster" "gke_cluster" {
 }
 
 resource "google_container_node_pool" "gke_node_pool" {
-  name     = "${var.cluster-name}-on-demand-nodes"
+  name     = "${var.cluster-name}-on-demand"
   cluster  = google_container_cluster.gke_cluster.name
   location = google_container_cluster.gke_cluster.location
 
@@ -81,7 +81,7 @@ resource "google_container_node_pool" "gke_node_pool" {
 }
 
 resource "google_container_node_pool" "spot_node_pool" {
-  name     = "${var.cluster-name}-spot-nodes"
+  name     = "${var.cluster-name}-spot"
   cluster  = google_container_cluster.gke_cluster.name
   location = google_container_cluster.gke_cluster.location
 
