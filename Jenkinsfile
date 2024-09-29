@@ -1,4 +1,3 @@
-ansiColor('xterm') {
 properties([
     parameters([
         string(
@@ -14,7 +13,9 @@ pipeline {
     stages {
         stage('Preparing') {
             steps {
+                ansiColor('xterm') {
                 sh 'echo Preparing'
+                }
             }
         }
         stage('Git Pulling') {
@@ -24,17 +25,22 @@ pipeline {
         }
         stage('Init') {
             steps {
+                ansiColor('xterm') {
                 sh 'terraform -chdir=gke/ init'
+                }
             }
         }
         stage('Validate') {
             steps {
+                ansiColor('xterm') {
                 sh 'terraform -chdir=gke/ validate'
+                }
             }
         }
         stage('Action') {
             steps {
-                    script {    
+                    script {
+                        ansiColor('xterm') {    
                         if (params.Terraform_Action == 'plan') {
                             sh "terraform -chdir=gke/ plan -var-file=${params.Environment}.tfvars"
                         }   else if (params.Terraform_Action == 'apply') {
@@ -44,9 +50,9 @@ pipeline {
                         } else {
                             error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
                         }
+                    }
                 }
             }
         }
     }
-}
 }
