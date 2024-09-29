@@ -1,3 +1,4 @@
+ansiColor('xterm') {
 properties([
     parameters([
         string(
@@ -47,4 +48,5 @@ pipeline {
             }
         }
     }
+}
 }
