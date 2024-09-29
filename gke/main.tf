@@ -1,8 +1,3 @@
-locals {
-  org = "medium"
-  env = var.env
-}
-
 module "gke" {
   source = "../module"
 
@@ -15,14 +10,14 @@ module "gke" {
   cloud-nat-name             = var.cloud-nat-name
   router-name                = var.router-name
   static-ip-name             = var.static-ip-name
-  cluster-name               = "${local.env}-${local.org}-${var.cluster-name}"
-  vpc-name                   = "${local.env}-${local.org}-${var.vpc-name}"
+  cluster-name               = var.cluster-name
+  vpc-name                   = var.vpc-name
   pub-cidr-block             = var.pub-cidr-block
-  pub-sub-name               = "${local.env}-${local.org}-${var.pub-sub-name}"
+  pub-sub-name               = var.pub-sub-name
   pri-cidr-block             = var.pri-cidr-block
-  pri-sub-name               = "${local.env}-${local.org}-${var.pri-sub-name}"
-  public-rt-name             = "${local.env}-${local.org}-${var.public-rt-name}"
-  private-rt-name            = "${local.env}-${local.org}-${var.private-rt-name}"
+  pri-sub-name               = var.pri-sub-name
+  public-rt-name             = var.public-rt-name
+  private-rt-name            = var.private-rt-name
   gke-egress-fw-rule         = var.gke-egress-fw-rule
   gke-ingress-fw-rule        = var.gke-ingress-fw-rule
   ondemand_instance_types    = var.ondemand_instance_types
