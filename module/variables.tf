@@ -1,6 +1,5 @@
 variable "cluster-name" {}
 variable "project" {}
-variable "cidr-block" {}
 variable "region" {}
 variable "jump-zone" {}
 variable "vpc-name" {}

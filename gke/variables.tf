@@ -5,7 +5,6 @@ variable "jump-zone" {
 }
 variable "env" {}
 variable "cluster-name" {}
-variable "vpc-cidr-block" {}
 variable "vpc-name" {}
 variable "pub-cidr-block" {}
 variable "static-ip-name" {}
