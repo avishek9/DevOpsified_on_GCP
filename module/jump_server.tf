@@ -1,6 +1,6 @@
 resource "google_compute_instance" "jump-server" {
   name         = "jump-server"
-  machine_type = "n2-standard-8"
+  machine_type = "n2-standard-4"
   zone         = var.jump-zone
   project = var.project
 
