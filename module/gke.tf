@@ -40,7 +40,7 @@ resource "google_container_cluster" "gke_cluster" {
 
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block   = google_compute_instance.jump-server.network_interface[0].network_ip
+      cidr_block   = google_compute_subnetwork.public_subnet.ip_cidr_range
       display_name = "Jump Server"
     }
   }
