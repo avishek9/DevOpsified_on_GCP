@@ -77,8 +77,6 @@ resource "google_container_node_pool" "gke_node_pool" {
     auto_repair  = true
     auto_upgrade = true
   }
-
-  initial_node_count = 1
 }
 
 resource "google_container_node_pool" "spot_node_pool" {
@@ -113,6 +111,4 @@ resource "google_container_node_pool" "spot_node_pool" {
     auto_repair  = true
     auto_upgrade = true
   }
-
-  initial_node_count = 1
 }
