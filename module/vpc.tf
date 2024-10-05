@@ -80,9 +80,9 @@ resource "google_compute_firewall" "gke-cluster-egress-fw-rule" {
 }
 
 resource "google_compute_firewall" "ingress-jump-server" {
-  name        = "ingress-tool-server"
+  name        = "ingress-jump-server"
   network     = google_compute_network.devopsified-gke-vpc.name
-  description = "Allowing Jenkins, Sonarqube, SSH Access"
+  description = "Allowing jump server to be accessed via internet"
 
   allow {
     protocol = "tcp"
