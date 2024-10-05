@@ -12,6 +12,8 @@ resource "google_compute_instance" "jump-server" {
     }
   }
 
+  tags = [ "jump-server" ]
+
   network_interface {
     subnetwork = google_compute_subnetwork.public_subnet.name
 

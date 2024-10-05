@@ -80,36 +80,36 @@ resource "google_container_node_pool" "gke_node_pool" {
   }
 }
 
-resource "google_container_node_pool" "spot_node_pool" {
-  name     = "${var.cluster-name}-spot"
-  cluster  = google_container_cluster.gke_cluster.name
-  location = google_container_cluster.gke_cluster.location
+# resource "google_container_node_pool" "spot_node_pool" {
+#   name     = "${var.cluster-name}-spot"
+#   cluster  = google_container_cluster.gke_cluster.name
+#   location = google_container_cluster.gke_cluster.location
 
-  node_count = var.desired_capacity_spot
+#   node_count = var.desired_capacity_spot
 
-  autoscaling {
-    min_node_count = var.min_capacity_spot
-    max_node_count = var.max_capacity_spot
-  }
+#   autoscaling {
+#     min_node_count = var.min_capacity_spot
+#     max_node_count = var.max_capacity_spot
+#   }
 
-  node_config {
-    preemptible  = true
-    machine_type = var.spot_instance_types
-    disk_size_gb = 70
+#   node_config {
+#     preemptible  = true
+#     machine_type = var.spot_instance_types
+#     disk_size_gb = 70
 
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring"
-    ]
+#     oauth_scopes = [
+#       "https://www.googleapis.com/auth/logging.write",
+#       "https://www.googleapis.com/auth/monitoring"
+#     ]
 
-    labels = {
-      type      = "spot"
-      lifecycle = "spot"
-    }
-  }
+#     labels = {
+#       type      = "spot"
+#       lifecycle = "spot"
+#     }
+#   }
 
-  management {
-    auto_repair  = true
-    auto_upgrade = true
-  }
-}
+#   management {
+#     auto_repair  = true
+#     auto_upgrade = true
+#   }
+# }
