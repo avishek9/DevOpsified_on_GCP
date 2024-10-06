@@ -8,7 +8,6 @@ pipeline {
         GCP_PROJECT_ID = credentials('GCP_PROJECT_ID') // Store GCP Project ID in Jenkins credentials
         GCP_REGION = 'us-central1' // Replace with your preferred GCP region
         GCR_REPO_NAME = 'frontend' // Replace with your GCR/Artifact Registry repository name
-        GITHUB_TOKEN = credentials('githubCred')
         REPOSITORY_URI = "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCR_REPO_NAME}/"
     }
     stages {
