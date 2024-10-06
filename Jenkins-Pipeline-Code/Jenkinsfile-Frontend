@@ -93,7 +93,7 @@ pipeline {
             environment {
                 GIT_REPO_NAME = "DevOpsified_on_GCP"
                 GIT_USER_NAME = "avishek9"
-                GITHUB_TOKEN = credentials(githubCred)
+                GITHUB_TOKEN = credentials('githubCred')
             }
             steps {
                 dir('Kubernetes-Manifests-file/Frontend') {
