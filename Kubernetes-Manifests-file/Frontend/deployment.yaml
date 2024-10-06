@@ -25,7 +25,7 @@ spec:
       - name: ecr-registry-secret
       containers:
       - name: frontend
-        image: us-central1-docker.pkg.dev/dummyproject-429106/backend:1
+        image: us-central1-docker.pkg.dev/dummyproject-429106/frontend:1
         imagePullPolicy: Always
         env:
           - name: REACT_APP_BACKEND_URL
