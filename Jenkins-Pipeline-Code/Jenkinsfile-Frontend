@@ -72,7 +72,7 @@ pipeline {
                     // // Authenticate with Google Cloud using service account credentials
                     // sh 'echo ${GCP_SERVICE_ACCOUNT_KEY} | base64 --decode > ${WORKSPACE}/gcp-key.json'
                     // sh 'gcloud auth activate-service-account --key-file=${WORKSPACE}/gcp-key.json'
-                    sh 'gcloud auth configure-docker --quiet'
+                    sh 'gcloud auth configure-docker us-central1-docker.pkg.dev --quiet'
 
                     // Tag and push the Docker image to GCR
                     sh 'docker tag ${GCR_REPO_NAME} ${REPOSITORY_URI}${GCR_REPO_NAME}:${BUILD_NUMBER}'
