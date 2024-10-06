@@ -96,7 +96,6 @@ pipeline {
             }
             steps {
                 dir('Kubernetes-Manifests-file/Backend') {
-                    withCredentials([string(credentialsId: 'githubCred', variable: 'GITHUB_TOKEN')]) {
                         sh '''
                             git config user.email "avishek9197@gmail.com"
                             git config user.name ${GIT_USER_NAME}
@@ -109,7 +108,6 @@ pipeline {
                             git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
                             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:master
                         '''
-                    }
                 }
             }
         }
