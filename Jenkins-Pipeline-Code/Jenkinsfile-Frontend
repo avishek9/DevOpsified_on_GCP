@@ -1,0 +1,118 @@
+pipeline {
+    agent any 
+    tools {
+        nodejs 'nodejs'
+    }
+    environment  {
+        SCANNER_HOME = tool 'sonar-scanner'
+        GCP_PROJECT_ID = credentials('GCP_PROJECT_ID') // Store GCP Project ID in Jenkins credentials
+        GCP_REGION = 'us-central1' // Replace with your preferred GCP region
+        GCR_REPO_NAME = 'frontend' // Replace with your GCR/Artifact Registry repository name
+        GITHUB_TOKEN = credentials('githubCred')
+        REPOSITORY_URI = "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCR_REPO_NAME}/"
+    }
+    stages {
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git') {
+            steps {
+                git credentialsId: 'githubCred', branch: 'master', url: 'https://github.com/avishek9/DevOpsified_on_GCP.git'
+            }
+        }
+        stage('Sonarqube Analysis') {
+            steps {
+                dir('Application-Code/frontend') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=frontend \
+                        -Dsonar.projectKey=frontend '''
+                    }
+                }
+            }
+        }
+        stage('Quality Check') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+        stage('OWASP Dependency-Check Scan') {
+            steps {
+                dir('Application-Code/frontend') {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+        stage('Trivy File Scan') {
+            steps {
+                dir('Application-Code/frontend') {
+                    sh 'trivy fs . > trivyfs.txt'
+                }
+            }
+        }
+        stage("Docker Image Build") {
+            steps {
+                script {
+                    dir('Application-Code/frontend') {
+                            sh 'docker system prune -f'
+                            sh 'docker container prune -f'
+                            sh 'docker build -t ${GCR_REPO_NAME} .'
+                    }
+                }
+            }
+        }
+        stage("GCR Image Pushing") {
+            steps {
+                script {
+                    // // Authenticate with Google Cloud using service account credentials
+                    // sh 'echo ${GCP_SERVICE_ACCOUNT_KEY} | base64 --decode > ${WORKSPACE}/gcp-key.json'
+                    // sh 'gcloud auth activate-service-account --key-file=${WORKSPACE}/gcp-key.json'
+                    // sh 'gcloud auth configure-docker --quiet'
+
+                    // Tag and push the Docker image to GCR
+                    sh 'docker tag ${GCR_REPO_NAME} ${REPOSITORY_URI}${GCR_REPO_NAME}:${BUILD_NUMBER}'
+                    sh 'docker push ${REPOSITORY_URI}${GCR_REPO_NAME}:${BUILD_NUMBER}'
+                }
+            }
+        }
+        stage("TRIVY Image Scan") {
+            steps {
+                sh 'trivy image ${REPOSITORY_URI}${GCR_REPO_NAME}:${BUILD_NUMBER} > trivyimage.txt' 
+            }
+        }
+        stage('Checkout Code') {
+            steps {
+                git credentialsId: 'githubCred', branch: 'master', url: 'https://github.com/avishek9/DevOpsified_on_GCP.git'
+            }
+        }
+        stage('Update Deployment file') {
+            environment {
+                GIT_REPO_NAME = "DevOpsified_on_GCP"
+                GIT_USER_NAME = "Avishek Goyal"
+            }
+            steps {
+                dir('Kubernetes-Manifests-file/Frontend') {
+                    withCredentials([string(credentialsId: 'githubCred', variable: 'GITHUB_TOKEN')]) {
+                        sh '''
+                            git config user.email "avishek9197@gmail.com"
+                            git config user.name ${GIT_USER_NAME}
+                            BUILD_NUMBER=${BUILD_NUMBER}
+                            echo $BUILD_NUMBER
+                            imageTag=$(grep -oP '(?<=frontend:)[^ ]+' deployment.yaml)
+                            echo $imageTag
+                            sed -i "s/${GCR_REPO_NAME}:${imageTag}/${GCR_REPO_NAME}:${BUILD_NUMBER}/" deployment.yaml
+                            git add deployment.yaml
+                            git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
+                            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:master
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
